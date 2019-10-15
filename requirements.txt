@@ -1,0 +1,4 @@
+nginx
+uwsgi
+flask
+pypinyin

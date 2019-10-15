@@ -92,7 +92,11 @@ class CoupletModel(object):
         for output in outputs:
             code = self._encode_seq(output)
             unique_words_num = str(len(set(output)))
-            same_code_num = str(sum([1 if code[i] == ori_code[i] else 0 for i in range(len(code))]))
+            # 部分结果长度不匹配
+            try:
+                same_code_num = str(sum([1 if code[i] == ori_code[i] else 0 for i in range(len(code))]))
+            except:
+                continue
             if len(same_code_num) == 1:
                 same_code_num = '0' + same_code_num
             if len(unique_words_num) == 1:
@@ -143,7 +147,6 @@ class CoupletModel(object):
             return {'error_code': 1001, 'error_msg': '输入长度过长或为空'}
         self.infer_words = self.text
         outputs = self.model.infer(self.infer_words)
-        print(json.dumps(outputs, ensure_ascii=False))
         if not outputs:
             return {'error_code': 1002, 'error_msg': '预测失败，内部异常'}
         outputs = outputs[0]
@@ -321,17 +324,9 @@ class PoetModel(object):
         outputs_list = self.model.infer(infer_words)
         self._repair_word(outputs_list, text)
         outputs_list = [self._filter_most_words(x) for x in outputs_list]
-        for outputs in outputs_list:
-            print(json.dumps(outputs, ensure_ascii=False))
         poet = self._get_best_poet(outputs_list)
         poet = [x.replace(' ', '') for x in poet]
         self.to_high_fre_words(poet)
         assert all([len(x) == 7 for x in poet])
         return {'error_code': 0, 'error_msg': '', 'poet': poet}
 
-if __name__ == '__main__':
-    # poet_model = PoetModel()
-    # print(poet_model.predict('招商银行'))
-    couplet = CoupletModel()
-    resp = couplet.predict('松子打孙子   。。。。  松子落孙子落')
-    print(resp)
