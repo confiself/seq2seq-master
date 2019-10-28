@@ -92,11 +92,6 @@ class Model(object):
         self.train_session = tf.Session(graph=self.train_graph,
                                         config=self.gpu_session_config())
 
-    def has_word(self, word):
-        if not isinstance(word, str):
-            word = word.decode('utf-8')
-        return word in self.infer_vocab_indices
-
     def _init_eval(self):
         self.eval_graph = tf.Graph()
         with self.eval_graph.as_default():
@@ -171,9 +166,9 @@ class Model(object):
                                                      self.train_reader.vocabs).split(' ')[1:]
                     target_text = ' '.join(target_text)
                     print('******************************')
-                    print(u'src: '.format(input_text))
-                    print(u'output: '.format(output_text))
-                    print(u'target: '.format(target_text))
+                    print('src:{}'.format(input_text))
+                    print('output:{}'.format(output_text))
+                    print('target:{}'.format(target_text))
                 if step % self.eval_step == 0:
                     bleu_score = self.eval(step)
                     print("Evaluate model. Step: %d, score: %f, loss: %f" % (
@@ -215,9 +210,9 @@ class Model(object):
                         print('====================')
                         input_text = reader.decode_text(in_seq[i],
                                                         self.eval_reader.vocabs)
-                        print(u'src:'.format(input_text))
-                        print(u'output: '.format(u' '.join(output_text)))
-                        print(u'target: '.format(u' '.join(target_text)))
+                        print('src:{}'.format(input_text))
+                        print('output:{}'.format(output_text))
+                        print('target:{}'.format(target_text))
             return bleu.compute_bleu(target_results, output_results)[0] * 100
 
     def reload_infer_model(self):

@@ -4,8 +4,8 @@ from model import Model
 
 app = Flask(__name__)
 
-vocab_file = '/opt/app/data/poet_seq/vocabs'
-model_dir = '/opt/app/data/poet_seq/output'
+vocab_file = '/tmp/chat/vocabs'
+model_dir = '/tmp/chat/output_dir'
 
 m = Model(
         None, None, None, None, vocab_file,
@@ -15,14 +15,14 @@ m = Model(
         restore_model=True, init_train=False, init_infer=True)
 
 
-@app.route('/chat/couplet/<in_str>')
+@app.route('/chat/<in_str>')
 def chat_couplet(in_str):
     if len(in_str) == 0 or len(in_str) > 50:
         output = u'您的输入太长了'
     else:
         output = m.infer(' '.join(in_str))
-        output = '|'.join(output)
-    print(u'上联：%s；下联：%s' % (in_str, output))
+    print('输入：{}'.format(in_str))
+    print('回复：{}'.format(output[0][0]))
     return jsonify({'output': output})
 
 app.run()

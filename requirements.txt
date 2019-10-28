@@ -1,4 +1,5 @@
-nginx
-uwsgi
+Tensorflow
+Python 3.6
+Dataset
 flask
 pypinyin

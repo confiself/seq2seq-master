@@ -2,10 +2,95 @@
 import os
 import re
 import json
+from utils import chars
 try:
     from utils.chars import tr2sp
 except:
     pass
+
+
+class GenChat(object):
+    def __init__(self):
+        self.max_encoder_seq_length = 30
+        self.max_decoder_seq_length = 30
+
+    @staticmethod
+    def create_novel():
+        data_path = '/tmp/xhj.csv'
+        vocabs = set()
+        with open(data_path) as f, open('/tmp/chat/in.txt', 'w') as f_in, open('/tmp/chat/out.txt', 'w') as f_out, \
+                open('/tmp/chat/vocabs', 'w') as f_v:
+            for line in f.readlines():
+                line = line.strip()
+                if not line:
+                    continue
+                for word in line:
+                    vocabs.add(word)
+                line = line.split('\t')
+                question = line[0]
+                answer = line[1]
+                f_in.writelines(' '.join(question) + '\n')
+                f_out.writelines(' '.join(answer) + '\n')
+            f_v.writelines('<s>' + '\n')
+            f_v.writelines('<\s>' + '\n')
+            for word in vocabs:
+                f_v.writelines(word + '\n')
+
+    @staticmethod
+    def get_xiaobing_corpus():
+        # data_path = '/tmp/3.log'
+        data_path = '/tmp/wei_bo_comments.txt'
+        vocabs = set()
+        with open(data_path, encoding='utf-8') as f, open('/tmp/chat/in.txt', 'w', encoding='utf-8') as f_in, \
+                open('/tmp/chat/out.txt', 'w', encoding='utf-8') as f_out, \
+                open('/tmp/chat/vocabs', 'w', encoding='utf-8') as f_v:
+            for line in f.readlines():
+                w = json.loads(line)
+                if w['user_name'] != '小冰':
+                    continue
+                if 'created_at' in w and w['created_at'] <= '2015-01-01':
+                    continue
+                text = GenChat.parse_text(w['text'])
+                reply_text = GenChat.parse_text(w['reply_text'])
+                if not text or not reply_text:
+                    continue
+                for x in text + reply_text:
+                    vocabs.add(x)
+                f_in.writelines(' '.join(reply_text) + '\n')
+                f_out.writelines(' '.join(text) + '\n')
+            f_v.writelines('<s>' + '\n')
+            f_v.writelines('</s>' + '\n')
+            for word in vocabs:
+                f_v.writelines(word + '\n')
+
+    @staticmethod
+    def parse_text(text):
+        """
+        1 只能是中文或英文常用符号，提取方式为text字段</a>:到最后， reply_text到最后  <span class=\"url-icon\">
+        2 "user_name": "小冰"
+        3 含有冰/小娜/领养词的不要，超过30个字的不要，[]去掉此间内容，若为4个字也不要，可能是成语
+        """
+        def _is_valid_word(word):
+            if '\u4E00' <= word <= '\u9FFF':
+                return True
+            if word in ',.?!~、？，。！“”：； …_()（）-|':
+                return True
+            return False
+
+        keys = ('冰', '小娜', '领养')
+        matcher = re.search('</a>:(.*?)(<span class=\"url-icon\">|$)', text)
+        if not matcher:
+            return None
+        words = matcher.group(1)
+        if len(words) > 30:
+            return None
+        if [x for x in keys if x in words]:
+            return None
+        words = re.sub('\[.*?\]', '', words).strip()
+        words = chars.tr2sp(words)
+        if not all([_is_valid_word(x) for x in words]):
+            return None
+        return words
 
 
 class GenPoetCorpus(object):
@@ -20,8 +105,8 @@ class GenPoetCorpus(object):
     def create_novel():
         data_path = '/tmp/xhj.csv'
         vocabs = set()
-        with open(data_path) as f, open('/tmp/chat/in.txt', 'w') as f_in, open('/tmp/chat/out.txt', 'w') as f_out,\
-        open('/tmp/chat/vocabs', 'w') as f_v:
+        with open(data_path) as f, open('/tmp/chat/in.txt', 'w') as f_in, open('/tmp/chat/out.txt', 'w') as f_out, \
+                open('/tmp/chat/vocabs', 'w') as f_v:
             for line in f.readlines():
                 line = line.strip()
                 if not line:
@@ -45,6 +130,7 @@ class GenPoetCorpus(object):
         2 out:当前诗句
         :return:
         """
+
         def _get_title(_poet, index):
             start_index = 0
             stop_index = min(len(_poet), 6)
@@ -105,3 +191,6 @@ class GenPoetCorpus(object):
                         error_count += 1
                         continue
                     f_w.writelines(up.strip() + '\t' + down.strip() + '\n')
+
+if __name__ == '__main__':
+    GenChat.get_xiaobing_corpus()

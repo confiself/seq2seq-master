@@ -6,10 +6,10 @@ from model import Model
 
 
 def _main(args):
-    train_input_file = os.path.join(args.corpus_dir, '/train/in.txt')
-    train_output_file = os.path.join(args.corpus_dir, '/train/out.txt')
-    test_input_file = os.path.join(args.corpus_dir, '/test/in.txt')
-    test_output_file = os.path.join(args.corpus_dir, '/test/out.txt')
+    train_input_file = os.path.join(args.corpus_dir, 'train/in.txt')
+    train_output_file = os.path.join(args.corpus_dir, 'train/out.txt')
+    test_input_file = os.path.join(args.corpus_dir, 'test/in.txt')
+    test_output_file = os.path.join(args.corpus_dir, 'test/out.txt')
     vocab_file = os.path.join(args.corpus_dir, 'vocabs')
     output_dir = args.output_dir
     if not args.output_dir:
@@ -32,7 +32,7 @@ def _main(args):
 
 
 def add_arguments(parser):
-    parser.add_argument("corpus_dir", type=str, default=None,
+    parser.add_argument("--corpus_dir", type=str, default=None,
                         help="corpus dir should include train/test dir and vocabs file")
     parser.add_argument("--num_units", type=int, default=768,
                         help="")

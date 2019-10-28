@@ -170,13 +170,13 @@ class PoetModel(object):
     _instance_lock = threading.Lock()
 
     def __init__(self):
-        vocab_file = '/opt/app/data/poet_seq/vocabs'
-        model_dir = '/opt/app/data/poet_seq/output'
+        vocab_file = '/opt/app/data/poet/vocabs'
+        model_dir = '/opt/app/data/poet/output'
         self.punctuation = '，。：！、；？ '
         self.pinyin_finals = {'a', 'o', 'e', 'i', '', 'v', 'ai', 'ei', 'ui',
                               'ao', 'o', 'i', 'ie', 've', 'er', 'an', 'en',
                               'in', 'un', 'vn', 'ang', 'eng', 'ing', 'ong'}
-        self.model = ModelInstance.get_instance('poet_model', vocab_file, model_dir, 100)
+        self.model = ModelInstance.get_instance('poet_model', vocab_file, model_dir, 200)
 
     def predict(self, text):
         try:

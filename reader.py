@@ -35,7 +35,7 @@ def decode_text(labels, vocabs, end_token='</s>'):
 
 
 def read_vocab(vocab_file):
-    f = open(vocab_file, 'r', encoding='utf-8')
+    f = open(vocab_file, encoding='utf-8')
     vocabs = [line[:-1] for line in f]
     f.close()
     return vocabs
@@ -56,7 +56,7 @@ class SeqReader(object):
         self.vocab_indices = dict((c, i) for i, c in enumerate(self.vocabs))
         self.data_queue = Queue(queue_size)
         self.worker_size = worker_size
-        with open(self.input_file) as f:
+        with open(self.input_file, encoding='utf-8') as f:
             for i, l in enumerate(f):
                 pass
             f.close()
@@ -102,8 +102,8 @@ class SeqReader(object):
 
     def _init_reader(self):
         self.data = []
-        input_f = open(self.input_file, 'rb')
-        target_f = open(self.target_file, 'rb')
+        input_f = open(self.input_file, encoding='utf-8')
+        target_f = open(self.target_file, encoding='utf-8')
         for input_line in input_f:
             input_line = input_line[:-1]
             target_line = target_f.readline()[:-1]
